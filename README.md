@@ -26,15 +26,9 @@ Engine_Reliability_Repo/
 │  └─ code.ipynb                                     # data cleaning & profiling
 ├─ powerbi/
 │  └─ Engine_Reliability.pbix                        # Power BI file (optional in repo)
-├─ reports/
-│  └─ images/                                        # exported PNGs from Power BI
-│     ├─ pbi_overview.png
-│     └─ pbi_stress.png
 ├─ requirements.txt
 └─ README.md
 ```
-
-> If the PBIX is large/private, keep it outside the repo and only include screenshots in `reports/images`.
 
 ---
 
@@ -45,14 +39,7 @@ Engine_Reliability_Repo/
 git clone https://github.com/Rash1105/Engine_Reliability_Repo.git
 cd Engine_Reliability_Repo
 
-# 2) (Optional) Virtual env
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-source .venv/bin/activate
-
-# 3) Install minimal deps
+# 2) Install minimal deps
 pip install -r requirements.txt
 ```
 
@@ -81,25 +68,22 @@ The notebook performs:
    - Median impute numeric gaps  
 4. **Outliers**  
    - Cap extreme `oph` (Operating Hours) at the 99th percentile  
-5. **Type fixes / encodings**  
-   - Map `issue_type` to numeric codes if needed  
-6. **Sanity checks**  
+5. **Sanity checks**  
    - Target distribution (`high_breakdown_risk`)  
    - Quick summaries of key fields (RPM, BMEP, NGI, etc.)  
-7. **Export cleaned data**  
+6. **Export cleaned data**  
    - Writes `data/clean/engine_clean.csv` for Power BI
 
 > **Target/label:** `high_breakdown_risk` (0/1)
 
 ---
 
-## 📊 Power BI (built separately)
+## 📊 Power BI 
 
 Use **Power BI Desktop** to connect to `data/clean/engine_clean.csv`.
 
-**Suggested pages & visuals**
 
-**Page 1 – Fleet Reliability Overview**
+**Page 1 – Engine Reliability Overview**
 - KPI cards:  
   - **Breakdown Rate %**  
   - **Average Max RPM**  
@@ -107,92 +91,31 @@ Use **Power BI Desktop** to connect to `data/clean/engine_clean.csv`.
   - **Full-Load Issue Rate %**
 - Bar: **High-risk rate by Issue Type**  
 - Line: **High-risk rate by Years in Service**  
-- Matrix (optional): NGI (nmol), Past Damage, Unplanned Events, RPM Max by year band
+- Matrix: NGI (nmol), Past Damage, Unplanned Events, RPM Max by year band
 
 **Page 2 – Component & Operational Stress**
 - KPI cards:  
-  - **Median BMEP**  
+  - **No. of Unplanned Events**  
   - **Avg NGI (nmol)**  
-  - **RPM Over-Limit %** (>1700)  
-  - **High-BMEP Share %** (top quartile)
+  - **Installed Turbo Chargers**  
+  - **Past Damages occurred**
 - Combo: **Median BMEP (bar)** + **Breakdown Rate (line)** by **Years in Service**  
-- Decomposition Tree (**Analyze:** Breakdown Rate %)  
-  **Explain by:** Issue Type → Years in Service → Resting Analysis → RPM Band → NGI Band → BMEP Band → Piston Material
+- Decomposition Tree (**Analyze:** Breakdown Risk Count)  
+  **Explain by:** Issue Type → Years in Service → Resting Analysis → Piston Material → Past Damages → Installed Turbo Chargers
 
-**Add dashboard screenshots**
-```
-reports/images/pbi_overview.png
-reports/images/pbi_stress.png
-```
-Then reference in this README:
-```markdown
-![Fleet Reliability Overview](reports/images/pbi_overview.png)
-![Component & Operational Stress](reports/images/pbi_stress.png)
-```
-
----
-
-## 🧾 Useful DAX (optional)
-
-```DAX
-Breakdown Rate % :=
-DIVIDE(
-    COUNTROWS( FILTER( Engine, Engine[high_breakdown_risk] = 1 )),
-    COUNTROWS( Engine )
-)
-
-Avg Max RPM := AVERAGE( Engine[rpm_max] )
-
-High-Risk Units := COUNTROWS( FILTER( Engine, Engine[high_breakdown_risk] = 1 ) )
-
-Full-Load Issue Rate % :=
-DIVIDE(
-    COUNTROWS( FILTER( Engine, Engine[full_load_issues] = 1 )),
-    COUNTROWS( Engine )
-)
-
--- Threshold KPIs
-High NGI Threshold := 500
-Pct Above NGI % :=
-DIVIDE(
-    COUNTROWS( FILTER( Engine, Engine[ng_imp] > [High NGI Threshold] )),
-    COUNTROWS( Engine )
-)
-
-RPM Limit := 1700
-RPM Over-Limit % :=
-DIVIDE(
-    COUNTROWS( FILTER( Engine, Engine[rpm_max] > [RPM Limit] )),
-    COUNTROWS( Engine )
-)
-
-Median BMEP := MEDIAN( Engine[bmep] )
-
-High BMEP Threshold :=
-PERCENTILEX.INC( ALLSELECTED( Engine ), Engine[bmep], 0.75 )
-
-High BMEP Share % :=
-DIVIDE(
-    COUNTROWS( FILTER( Engine, Engine[bmep] >= [High BMEP Threshold] )),
-    COUNTROWS( Engine )
-)
-```
-
----
 
 ## 🔄 Refresh workflow
 
 1. Drop a new raw CSV into `data/raw/`.  
 2. Re-run `notebooks/code.ipynb` → produces `data/clean/engine_clean.csv`.  
 3. Open Power BI Desktop → **Refresh** to update all KPIs/visuals.  
-4. Export updated screenshots to `reports/images/` (optional).
 
 ---
 
 ## 📚 Short data dictionary (business-focused)
 
 - **oph** — Operating hours (usage & wear)  
-- **issue_type** — Combustion issue class (typical/atypical/…)  
+- **issue_type** — Combustion issue type (typical/atypical/non-related/non-symptomatic)  
 - **bmep** — Brake mean effective pressure (efficiency proxy)  
 - **ng_imp** — Natural-gas impurities (nmol; fuel quality)  
 - **rpm_max** — Maximum RPM (mechanical stress)  
