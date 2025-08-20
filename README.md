@@ -7,57 +7,25 @@
 ---
 
 ## 📌 Project Overview
-This repo analyzes engine operational data to **identify drivers of breakdown risk** and to **forecast high‑risk units**. It combines a **Python notebook** for EDA + modeling and a **Power BI** page for executive KPIs.
+This repo analyzes engine operational data to **identify drivers of breakdown risk** and to **forecast high‑risk units**. It combines a **Python notebook** for data cleaning and a **Power BI** page for executive KPIs.
 
 - **Dataset size:** 316 rows, 15 fields  
-- **Target variable:** `high_breakdown_risk` (0/1)  
+- **Target variable:** `high_breakdown_risk` 
 - **Goal:** Explain what drives failures, quantify risk, and propose actionable controls (fuel quality, RPM limits, material choice, maintenance timing).
 
-**Deliverables**
-- `notebooks/code.ipynb` (Python EDA & modeling)
-- `reports/presentation/…` (slides)
-- `reports/figures/…` (feature importance, risk matrix, etc.)
-- `powerbi/` (PBIX or screenshots for KPI page)
-
----
 
 ## 🧠 Key Findings (business summary)
 - **Breakdown rate ≈ 54%.** Highest‑risk cohort at **8 years** in service.
 - **Top drivers:** **Combustion issue type** and **Max RPM**; turbocharger count also contributes.
 - **BMEP matters:** Within a given year band, **lower BMEP ↔ higher failure risk** (performance decline signal).
-- **Fuel quality:** **NGI (nmol) > 500** materially elevates risk.
+- **Fuel quality:** **High NGI (nmol)** elevates breakdown risk.
 - **Interaction hotspot:** **High RPM × High NGI** amplifies failures → ideal for alerting.
-- **Full‑load testing/logging** appears *protective* (issues found earlier).
 - **Certain piston materials** sustain higher median BMEP → **longer service life**.
 
-> **Business impact:** Targeted predictive maintenance, RPM caps, and fuel‑quality controls can materially reduce unplanned downtime and warranty costs.
+> **Business impact:** Targeted predictive maintenance, RPM caps, and fuel‑quality controls can reduce unplanned downtime and warranty costs of engines.
 
 ---
 
-## 🗂️ Repository Structure (suggested)
-```
-Engine_Reliability_Repo/
-├─ data/
-│  ├─ raw/assessment - Data Analytics - INNIO.csv
-│  └─ metadata/dataset.txt
-├─ notebooks/
-│  └─ code.ipynb
-├─ src/                     # (optional: helpers if you modularize)
-│  ├─ features.py
-│  └─ modeling.py
-├─ powerbi/
-│  └─ Engine_Reliability.pbix   # or screenshots if PBIX can’t be shared
-├─ reports/
-│  ├─ figures/                  # export images used in README/Slides
-│  │  ├─ feature_importance_random_forest.png
-│  │  ├─ feature_influence_logistic.png
-│  │  └─ risk_matrix_rpm_x_ngi.png
-│  └─ presentation/
-│     └─ Engine_Breakdown_Risk_Analysis_Presentation.pptx
-└─ README.md
-```
-
----
 
 ## ⚙️ Environment & Setup
 
@@ -80,8 +48,7 @@ pandas
 numpy
 scikit-learn
 matplotlib
-seaborn
-jupyter
+PowerBI
 ```
 
 ---
