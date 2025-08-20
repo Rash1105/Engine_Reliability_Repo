@@ -25,7 +25,7 @@ Engine_Reliability_Repo/
 ├─ notebooks/
 │  └─ code.ipynb                                     # data cleaning & profiling
 ├─ powerbi/
-│  └─ Engine_Reliability.pbix                        # Power BI file (optional in repo)
+│  └─ Engine_Reliability.pbix                        
 ├─ requirements.txt
 └─ README.md
 ```
